@@ -14,13 +14,11 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     return next(new ErrorHandler("All fields are required", 400));
   }
 
-  // ✅ check if already verified account exists
   const existingUser = await User.findOne({ email });
   if (existingUser) {
     return next(new ErrorHandler("Email already exists", 400));
   }
 
-  // ✅ create user
   const user = await User.create({
     name,
     email,
@@ -28,11 +26,9 @@ export const register = catchAsyncErrors(async (req, res, next) => {
     role: role?.toLowerCase(),
   });
 
-  // ✅ generate verification code
   const verificationCode = user.generateVerificationCode();
   await user.save();
 
-  // ✅ send verification email
   const message = `
     <h1>Hello ${name}</h1>
     <p>Your verification code is:</p>
